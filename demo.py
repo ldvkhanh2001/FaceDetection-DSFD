@@ -65,7 +65,8 @@ def infer(net , img , transform , thresh , cuda , shrink):
     if shrink != 1:
         img = cv2.resize(img, None, None, fx=shrink, fy=shrink, interpolation=cv2.INTER_LINEAR)
     x = torch.from_numpy(transform(img)[0]).permute(2, 0, 1)
-    x = Variable(x.unsqueeze(0) , volatile=True)
+    with torch.no_grad():
+        x = Variable(x.unsqueeze(0) )
     if cuda:
         x = x.cuda()
     #print (shrink , x.shape)
@@ -168,7 +169,7 @@ def test_oneimage():
     cfg = widerface_640
     num_classes = len(WIDERFace_CLASSES) + 1 # +1 background
     net = build_ssd('test', cfg['min_dim'], num_classes) # initialize SSD
-    net.load_state_dict(torch.load(args.trained_model))
+    net.load_state_dict(torch.load(args.trained_model, map_location='cpu'))
     net.cuda()
     net.eval()
     print('Finished loading model!')

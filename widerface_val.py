@@ -58,7 +58,8 @@ def detect_face(image, shrink):
 
     x = torch.from_numpy(x).permute(2, 0, 1)
     x = x.unsqueeze(0)
-    x = Variable(x.cuda(), volatile=True)
+    with torch.no_grad():
+        x = Variable(x.cuda())
 
     #net.priorbox = PriorBoxLayer(width,height)
     y = net(x)
@@ -274,6 +275,7 @@ def vis_detections(imgid, im,  dets, thresh=0.5):
 print('Finished loading data')    
 def test_widerface():
     # evaluation
+    torch.set_grad_enabled(False)
     cuda = args.cuda
     transform = TestBaseTransform((104, 117, 123))
     thresh=cfg['conf_thresh']
